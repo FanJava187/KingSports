@@ -12,9 +12,16 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import com.example.kingsports.KingsportsApplication;
+// ... (其他匯入)
+
 @SpringBootTest
 @AutoConfigureMockMvc
 public class AuthControllerTest {
+
+    static {
+        KingsportsApplication.loadEnv();
+    }
 
     @Autowired
     private MockMvc mockMvc;

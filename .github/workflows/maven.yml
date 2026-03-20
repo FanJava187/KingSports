@@ -18,7 +18,11 @@ jobs:
           MYSQL_DATABASE: kingsports_db
         ports:
           - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
 
     steps:
     - uses: actions/checkout@v4
@@ -33,17 +37,10 @@ jobs:
     - name: Grant execute permission for mvnw
       run: chmod +x mvnw
 
-    - name: Wait for MySQL to be ready
-      run: |
-        until docker exec $(docker ps -q --filter ancestor=mysql:8.0) mysqladmin ping -h "localhost" --silent; do
-          echo "Waiting for MySQL to be ready..."
-          sleep 5
-        done
-
     - name: Build and Test with Maven
       env:
-        DB_URL: jdbc:mysql://localhost:3306/kingsports_db?serverTimezone=Asia/Taipei&useSSL=false&allowPublicKeyRetrieval=true
+        DB_URL: jdbc:mysql://127.0.0.1:3306/kingsports_db?serverTimezone=Asia/Taipei&useSSL=false&allowPublicKeyRetrieval=true
         DB_USERNAME: root
         DB_PASSWORD: root
         JWT_SECRET: CI_TEST_SECRET_KEY_FOR_KINGSPORTS_PROJECT_2026
-      run: ./mvnw test
+      run: ./mvnw clean test

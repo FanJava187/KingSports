@@ -22,9 +22,16 @@ import java.math.BigDecimal;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.example.kingsports.KingsportsApplication;
+// ... (其他匯入)
+
 @SpringBootTest
 @AutoConfigureMockMvc
 public class AdminProductTest {
+
+    static {
+        KingsportsApplication.loadEnv(); // 確保測試時也能抓到變數
+    }
 
     @Autowired
     private MockMvc mockMvc;
