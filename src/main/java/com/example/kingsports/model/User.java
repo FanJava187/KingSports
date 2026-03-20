@@ -27,9 +27,18 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @Column(length = 20)
+    @Column(length = 20, columnDefinition = "VARCHAR(20) DEFAULT 'USER'")
+    @Builder.Default
     private String role = "USER";
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @PrePersist
+    protected void onCreate() {
+        if (this.createdAt == null) {
+            this.createdAt = LocalDateTime.now();
+        }
+    }
 }

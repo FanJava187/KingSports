@@ -3,44 +3,38 @@
 KingSports 是一個以 Java (Spring Boot) + MySQL + Vue 3 構建的現代化運動品牌電商系統。
 
 ## 📋 專案狀態
-- **後端 (API)**: 已完成核心業務邏輯與安全性配置。
+- **後端 (API)**: 核心業務邏輯已完成，並實作管理員權限控管。
 - **前端 (Vue)**: 規劃中 (即將開始)。
-- **資料庫**: 已完成結構設計並導入初始測試資料。
+- **資料庫**: 結構已同步，支援自動化時間戳記與預設角色。
 
 ## 🛠️ 技術棧
 - **後端**: Java 17, Spring Boot 3.x, Spring Security, JWT, JPA (Hibernate), Maven.
 - **資料庫**: MySQL 8.0.
-- **校驗與測試**: JUnit 5, MockMvc, Jakarta Validation.
+- **工具**: Lombok, Dotenv-java, GitHub Actions CI/CD.
 
 ## 🚀 已實作功能
-1.  **會員系統**: 
-    - 支援 JWT 身份驗證與 BCrypt 密碼加密。
-    - 完善的註冊校驗（名稱、Email、密碼強度）。
+1.  **權限與認證**: 
+    - 支援 JWT 身份驗證。
+    - **RBAC 權限控管**: 區分 `USER` (消費者) 與 `ADMIN` (後台管理)。
+    - 使用 `@PreAuthorize` 嚴格限制敏感 API。
 2.  **商品模組**: 
-    - 商品分類管理、全品項展示、分類篩選。
-3.  **購物車系統**: 
+    - 支援管理員新增商品、訪客瀏覽商品、分類篩選。
+    - 商品與使用者均具備自動化的 `createdAt` 與 `updatedAt` 紀錄。
+3.  **購物車與訂單**: 
     - 支援登入使用者即時存取購物清單。
-4.  **訂單與結帳**: 
-    - 完整結帳流程、庫存自動扣除、交易事務控制。
+    - 完整結帳流程與庫存自動扣除。
 
-## 📂 資料庫結構 (Database Schema)
-- `users`: 會員資料與角色控管。
-- `categories`: 商品分類（如路跑、越野跑）。
-- `products`: 商品詳情與庫存。
-- `cart_items`: 使用者購物車暫存。
-- `orders` & `order_items`: 訂單主表與明細紀錄。
-
-## 📝 開發紀錄 (2026-03-20)
+## 📝 開發紀錄 (2026-03-21)
 ### 實作內容：
-- 專案名稱全面更正為 `KingSports`。
-- 建立 JWT 認證機制，包含 `JwtAuthenticationFilter` 與 `JwtUtils`。
-- 實作電商核心 API：`Auth`, `Product`, `Category`, `Cart`, `Order`。
-- 完成 12 項後端整合測試，驗證從註冊到結帳的完整流程。
+- 實作管理員新增商品 API (`POST /api/products`)。
+- 配置 `@EnableMethodSecurity` 並實作 `USER` / `ADMIN` 角色區分。
+- 使用 `@Builder.Default` 與 JPA `@PrePersist` 解決 Lombok Builder 造成的欄位預設值遺失問題。
+- 同步 MySQL 資料表結構，確保 `role` 與 `created_at` 具备正確的預設值。
 
 ### 遇到的錯誤與修正：
-- **編碼問題**: 在 Windows Maven 環境下，中文字串導致編譯失敗。
-  - *修正*: 將所有 Java 回應字串與校驗訊息統一改為英文，並於 `pom.xml` 強制指定 UTF-8 編碼。
-- **資料清理順序**: 測試時因外鍵約束無法刪除商品。
-  - *修正*: 調整 `setUp` 順序，先刪除依賴項（購物車、訂單）再刪除商品與分類。
-- **遞迴序列化**: Jackson 在處理 Order 與 OrderItem 時發生遞迴。
-  - *修正*: 對 `OrderItem.order` 欄位加入 `@JsonIgnore` 以阻斷循環。
+- **時間紀錄遺失**: 使用 Lombok Builder 時預設值失效。
+  - *修正*: 加入 `@Builder.Default` 註解並配合 JPA 生命週期勾子。
+- **管理員存取遭拒 (403)**: 資料庫角色變更後舊 Token 依然攜帶舊權限。
+  - *修正*: 重新登入以刷新 JWT Claims，並於 `SecurityConfig` 明確區分 HttpMethod (GET 公開，POST 需驗證)。
+- **業務邏輯報錯 (Category not found)**: 新增商品時傳入不存在的 ID。
+  - *修正*: 強化 API 回應訊息，並確認資料庫分類 ID 的一致性。
