@@ -31,4 +31,9 @@ jobs:
         cache: maven
 
     - name: Build and Test with Maven
-      run: ./mvnw test -Dspring.datasource.password=root -Dspring.datasource.url="jdbc:mysql://localhost:3306/kingsports_db?serverTimezone=Asia/Taipei&useSSL=false&allowPublicKeyRetrieval=true"
+      env:
+        DB_URL: jdbc:mysql://localhost:3306/kingsports_db?serverTimezone=Asia/Taipei&useSSL=false&allowPublicKeyRetrieval=true
+        DB_USERNAME: root
+        DB_PASSWORD: root
+        JWT_SECRET: CI_TEST_SECRET_KEY_FOR_KINGSPORTS_PROJECT_2026
+      run: ./mvnw test
