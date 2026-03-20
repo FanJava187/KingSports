@@ -23,8 +23,12 @@ import java.math.BigDecimal;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.springframework.test.context.ActiveProfiles;
+// ... (其他匯入)
+
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 public class AdminProductTest {
 
     static {
