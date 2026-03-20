@@ -30,5 +30,20 @@ jobs:
         distribution: 'temurin'
         cache: maven
 
+    - name: Grant execute permission for mvnw
+      run: chmod +x mvnw
+
+    - name: Wait for MySQL to be ready
+      run: |
+        until docker exec $(docker ps -q --filter ancestor=mysql:8.0) mysqladmin ping -h "localhost" --silent; do
+          echo "Waiting for MySQL to be ready..."
+          sleep 5
+        done
+
     - name: Build and Test with Maven
-      run: ./mvnw test -Dspring.datasource.password=root -Dspring.datasource.url="jdbc:mysql://localhost:3306/kingsports_db?serverTimezone=Asia/Taipei&useSSL=false&allowPublicKeyRetrieval=true"
+      env:
+        DB_URL: jdbc:mysql://localhost:3306/kingsports_db?serverTimezone=Asia/Taipei&useSSL=false&allowPublicKeyRetrieval=true
+        DB_USERNAME: root
+        DB_PASSWORD: root
+        JWT_SECRET: CI_TEST_SECRET_KEY_FOR_KINGSPORTS_PROJECT_2026
+      run: ./mvnw test
