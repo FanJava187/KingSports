@@ -1,5 +1,6 @@
 package com.example.kingsports.controller;
 
+import com.example.kingsports.KingsportsApplication;
 import com.example.kingsports.dto.LoginRequest;
 import com.example.kingsports.dto.ProductRequest;
 import com.example.kingsports.model.Category;
@@ -22,15 +23,12 @@ import java.math.BigDecimal;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.example.kingsports.KingsportsApplication;
-// ... (其他匯入)
-
 @SpringBootTest
 @AutoConfigureMockMvc
 public class AdminProductTest {
 
     static {
-        KingsportsApplication.loadEnv(); // 確保測試時也能抓到變數
+        KingsportsApplication.loadEnv();
     }
 
     @Autowired
@@ -56,22 +54,19 @@ public class AdminProductTest {
         userRepository.deleteAll();
         categoryRepository.deleteAll();
 
-        // 1. 建立 ADMIN 使用者
         User admin = User.builder()
                 .username("admin_user")
                 .email("admin@kingsports.com")
                 .password(passwordEncoder.encode("admin123"))
-                .role("ADMIN") // 確保角色正確
+                .role("ADMIN")
                 .build();
         userRepository.save(admin);
 
-        // 2. 建立一個分類
         Category category = new Category();
         category.setName("Running");
         category = categoryRepository.save(category);
         this.categoryId = category.getId();
 
-        // 3. 登入取得 Token
         LoginRequest loginRequest = new LoginRequest();
         loginRequest.setUsername("admin_user");
         loginRequest.setPassword("admin123");
